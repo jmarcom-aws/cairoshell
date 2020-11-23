@@ -210,7 +210,7 @@ namespace CairoDesktop.Interop
 
         public static bool ExecuteProcess(string filename)
         {
-            System.Diagnostics.Process proc = new System.Diagnostics.Process();
+            Process proc = new Process();
             proc.StartInfo.UseShellExecute = true;
             proc.StartInfo.FileName = filename;
 
@@ -221,7 +221,7 @@ namespace CairoDesktop.Interop
             catch
             {
                 // No 'Open' command associated with this filetype in the registry
-                Interop.Shell.ShowOpenWithDialog(proc.StartInfo.FileName);
+                ShowOpenWithDialog(proc.StartInfo.FileName);
                 return false;
             }
         }
@@ -235,13 +235,20 @@ namespace CairoDesktop.Interop
                     filename.Replace("system32", "sysnative");
                 }
 
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    UseShellExecute = true
+                };
+
                 if (filename.StartsWith("appx:"))
                 {
-                    Process.Start("LaunchWinApp.exe", "shell:appsFolder\\" + filename.Substring(5));
+                    psi.FileName = "LaunchWinApp.exe";
+                    psi.Arguments = "shell:appsFolder\\" + filename.Substring(5);
                 }
                 else if (filename.Contains("://"))
                 {
-                    Process.Start("explorer.exe", filename);
+                    psi.FileName = "explorer.exe";
+                    psi.Arguments = filename;
                 }
                 else
                 {
@@ -249,13 +256,16 @@ namespace CairoDesktop.Interop
                     {
                         // if we are shell and launching explorer, give it a parameter so that it doesn't do shell things.
                         // this opens My Computer
-                        Process.Start(filename, "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}");
+                        psi.FileName = filename;
+                        psi.Arguments = "::{20D04FE0-3AEA-1069-A2D8-08002B30309D}";
                     }
                     else
                     {
-                        Process.Start(filename);
+                        psi.FileName = filename;
                     }
                 }
+
+                Process.Start(psi);
 
                 return true;
             }
@@ -274,7 +284,14 @@ namespace CairoDesktop.Interop
                     filename.Replace("system32", "sysnative");
                 }
 
-                Process.Start(filename, args);
+                ProcessStartInfo psi = new ProcessStartInfo
+                {
+                    UseShellExecute = true,
+                    FileName = filename,
+                    Arguments = args
+                };
+
+                Process.Start(psi);
 
                 return true;
             }
