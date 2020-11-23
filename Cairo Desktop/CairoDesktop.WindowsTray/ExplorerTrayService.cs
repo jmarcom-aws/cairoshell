@@ -155,6 +155,15 @@ namespace CairoDesktop.WindowsTray
                     {
                         trayItem = (TrayItem) Marshal.PtrToStructure(hTrayItem, typeof(TrayItem));
 
+                        if ((tbButton.fsState & TBSTATE_HIDDEN) != 0)
+                        {
+                            trayItem.dwState = 1;
+                        }
+                        else
+                        {
+                            trayItem.dwState = 0;
+                        }
+
                         CairoLogger.Instance.Debug(
                             $"ExplorerTrayService: Got tray item: {trayItem.szIconText}");
                     }
@@ -175,8 +184,8 @@ namespace CairoDesktop.WindowsTray
             nid.hIcon = trayItem.hIcon;
             nid.uVersion = trayItem.uVersion;
             nid.guidItem = trayItem.guidItem;
-            nid.dwState = 0;
-            nid.uFlags = NIF.GUID | NIF.MESSAGE | NIF.TIP;
+            nid.dwState = (int)trayItem.dwState;
+            nid.uFlags = NIF.GUID | NIF.MESSAGE | NIF.TIP | NIF.STATE;
 
             if (nid.hIcon != IntPtr.Zero)
             {
@@ -236,6 +245,8 @@ namespace CairoDesktop.WindowsTray
                 CairoLogger.Instance.Debug($"ExplorerTrayService: Unable to set EnableAutoTray setting: {e.Message}");
             }
         }
+
+        private const byte TBSTATE_HIDDEN = 8;
 
         private enum TB : uint
         {
