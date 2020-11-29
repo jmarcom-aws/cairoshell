@@ -212,7 +212,7 @@ namespace CairoDesktop
 
         protected override void CustomClosing()
         {
-            if (WindowManager.Instance.IsSettingDisplays || Startup.IsShuttingDown)
+            if (WindowManager.Instance.IsSettingDisplays || CairoApplication.IsShuttingDown)
             {
                 WindowsTasks.WindowsTasksService.Instance.GroupedWindows.CollectionChanged -= GroupedWindows_Changed;
             }
