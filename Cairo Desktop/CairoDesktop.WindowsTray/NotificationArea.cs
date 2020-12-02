@@ -6,7 +6,6 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Data;
-using CairoDesktop.Common.Helpers;
 using static CairoDesktop.Interop.NativeMethods;
 
 namespace CairoDesktop.WindowsTray
