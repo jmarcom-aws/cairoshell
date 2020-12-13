@@ -61,6 +61,11 @@
     <Compile Include="DependencyInjection\DependancyLoader.cs" />
     <Compile Include="DependencyInjection\DependencyInjectionExtensions.cs" />
     <Compile Include="DependencyInjection\DependencyResolver.cs" />
+    <Compile Include="Logging\CairoFileLogger.cs" />
+    <Compile Include="Logging\CairoFileLoggerOptions.cs" />
+    <Compile Include="Logging\CairoFileLoggerProvider.cs" />
+    <Compile Include="Logging\LegacyCairoLogObserver.cs" />
+    <Compile Include="Logging\LogSeverity.cs" />
     <Compile Include="Services\ExtensionService.cs" />
     <Compile Include="Services\WinSparkleUpdateService.cs" />
   </ItemGroup>

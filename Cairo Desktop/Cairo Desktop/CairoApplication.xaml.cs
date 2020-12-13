@@ -1,8 +1,8 @@
 ﻿using CairoDesktop.Application.Interfaces;
 using CairoDesktop.Common;
-using CairoDesktop.Common.Logging;
 using CairoDesktop.Configuration;
 using CairoDesktop.Infrastructure.DependencyInjection;
+using CairoDesktop.Infrastructure.Logging;
 using CairoDesktop.Interop;
 using CairoDesktop.ObjectModel;
 using CairoDesktop.SupportingClasses;
@@ -10,6 +10,7 @@ using CairoDesktop.WindowsTasks;
 using CairoDesktop.WindowsTray;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -34,6 +35,8 @@ namespace CairoDesktop
         private bool _isTour;
         private bool _forceEnableShellMode;
         private bool _forceDisableShellMode;
+
+        private ILogger<CairoApplication> _logger;
 
         public CairoApplication()
         {
@@ -69,7 +72,11 @@ namespace CairoDesktop
                 })
                 .ConfigureLogging((context, logging) =>
                 {
-                    logging.AddInfrastructureLogging();
+                    logging.AddInfrastructureLogging(options =>
+                    {
+                        options.FolderPath = LogsFolder;
+                        options.Severity = GetLogSeveritySetting(defaultValue: LogSeverity.Info);
+                    });
                 })
                 .Build();
         }
@@ -78,16 +85,18 @@ namespace CairoDesktop
         {
             Host.Start();
 
+            _logger = Host.Services.GetService<ILogger<CairoApplication>>();
+
             SetShellReadyEvent();
 
             SetupSettings(); // run this before logging setup so that preferences are always used
 
+            var legacyLogger = Host.Services.GetService<LegacyCairoLogObserver>();
+
             // Initialize current shell information here, since it won't be accurate if we wait until after we create our own windows
             SetIsCairoRunningAsShell();
 
-            SetupLoggingSystem();
-
-            WriteApplicationDebugInfoToConsole();
+            WriteApplicationDebugInfoToConsole(_logger);
 
             SetSystemKeyboardShortcuts();
 
@@ -265,7 +274,7 @@ namespace CairoDesktop
 
             string msg = "Would you like to restart Cairo?\r\n\r\nPlease submit a bug report with a screenshot of this error. Thanks! \r\nMessage: " + e.Exception.Message + "\r\nTarget Site: " + e.Exception.TargetSite + "\r\nVersion: " + version + "\r\n\r\n" + e.Exception.StackTrace + inner;
 
-            CairoLogger.Instance.Error(msg, e.Exception);
+            _logger.LogError(msg, e.Exception);
 
             string dMsg;
 
@@ -361,6 +370,18 @@ namespace CairoDesktop
             // setting the exit status to 1 indicates that we are shutting down gracefully and do not want the local machine shell to restart
             Environment.ExitCode = 1;
         }
+
+        private LogSeverity GetLogSeveritySetting(LogSeverity defaultValue)
+        {
+            if (!Enum.TryParse(Settings.Instance.LogSeverity, out LogSeverity result))
+            {
+                Settings.Instance.LogSeverity = defaultValue.ToString();
+                result = defaultValue;
+            }
+
+            return result;
+        }
+
 
         public static bool IsShuttingDown { get; set; }
 

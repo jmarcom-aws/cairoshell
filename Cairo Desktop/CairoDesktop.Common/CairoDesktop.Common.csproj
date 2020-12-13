@@ -84,8 +84,6 @@
     <Compile Include="HotKey.cs" />
     <Compile Include="HotKeyModifier.cs" />
     <Compile Include="IconSize.cs" />
-    <Compile Include="Logging\Loggers\CairoLogger.cs" />
-    <Compile Include="Logging\Providers\CairoLoggerProvider.cs" />
     <Compile Include="NavigationManager.cs" />
     <Compile Include="Helpers\RegistryChangeMonitor.cs" />
     <Compile Include="LowLevelKeyboardListener.cs" />
@@ -99,9 +97,6 @@
     <Compile Include="Logging\ILog.cs" />
     <Compile Include="Logging\LogEventArgs.cs" />
     <Compile Include="Logging\LogSeverity.cs" />
-    <Compile Include="Logging\Observers\ConsoleLog.cs" />
-    <Compile Include="Logging\Observers\DisposableLogBase.cs" />
-    <Compile Include="Logging\Observers\FileLog.cs" />
     <Compile Include="Logging\CairoLogger.cs" />
     <Compile Include="MessageBoxButtonConverter.cs" />
     <Compile Include="CairoMessageImageConverter.cs" />
